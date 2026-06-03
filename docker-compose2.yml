@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   fwc-vog-timing-team2:
-    build: .
+    image: ghcr.io/${GITHUB_OWNER}/fwc-timer:latest
     container_name: ${CONTAINER_NAME:-fwc-vog-timing-team2}
     restart: unless-stopped
     ports:
