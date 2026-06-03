@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Presets — FWC VoG Timing System</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-brand">
+      <svg class="logo" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="DAZN">
+        <text x="0" y="20" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="22" fill="#F8FF00">DAZN</text>
+      </svg>
+      <div>
+        <div class="header-title" id="headerTitle">FWC VoG Timing System</div>
+        <div class="header-instance" id="headerInstance"></div>
+      </div>
+    </div>
+    <nav class="header-nav">
+      <a href="/" class="nav-btn">
+        ⏱ <span class="nav-label">Clock</span>
+      </a>
+      <a href="/presets" class="nav-btn active">
+        ☰ <span class="nav-label">Presets</span>
+      </a>
+    </nav>
+  </header>
+
+  <!-- Main -->
+  <main class="main-content">
+    <div class="presets-layout">
+
+      <!-- Sidebar -->
+      <aside class="presets-sidebar">
+        <div class="sidebar-header">
+          <h2>Saved Presets</h2>
+          <button class="btn btn-secondary" id="newPresetBtn" style="font-size:0.75rem;padding:0.35rem 0.75rem;">
+            + New
+          </button>
+        </div>
+        <ul class="preset-sidebar-list" id="presetSidebarList">
+          <li style="padding:1rem;color:var(--dazn-text-muted);font-size:0.85rem;">Loading...</li>
+        </ul>
+
+        <!-- Import -->
+        <div style="padding:0.75rem 1rem;border-top:1px solid var(--dazn-light-grey);">
+          <div class="import-area" id="importArea">
+            <p>📂 Drop a preset JSON here<br/>or click to import</p>
+            <input type="file" id="importFileInput" accept=".json" style="display:none;" />
+          </div>
+        </div>
+      </aside>
+
+      <!-- Editor -->
+      <section class="preset-editor" id="presetEditor">
+
+        <!-- Empty state -->
+        <div class="editor-empty" id="editorEmpty">
+          <div class="editor-empty-icon">🎬</div>
+          <p style="font-size:1rem;font-weight:600;margin-bottom:0.5rem;">No preset selected</p>
+          <p style="font-size:0.85rem;">Select a preset from the list or create a new one.</p>
+        </div>
+
+        <!-- Editor form (hidden until a preset is selected/created) -->
+        <div id="editorForm" class="hidden">
+          <div class="editor-header">
+            <h2 id="editorTitle">Edit Preset</h2>
+            <div class="editor-header-actions">
+              <button class="btn btn-secondary" id="exportPresetBtn" style="font-size:0.8rem;padding:0.4rem 0.9rem;">
+                ⬇ Export
+              </button>
+              <button class="btn btn-secondary" id="cancelEditBtn" style="font-size:0.8rem;padding:0.4rem 0.9rem;">
+                Cancel
+              </button>
+              <button class="btn btn-primary" id="savePresetBtn" style="font-size:0.8rem;padding:0.4rem 1.2rem;min-width:auto;">
+                💾 Save
+              </button>
+            </div>
+          </div>
+
+          <div class="editor-body">
+            <input type="hidden" id="editingPresetId" value="" />
+
+            <div class="form-group">
+              <label class="form-label" for="presetName">Preset Name *</label>
+              <input class="form-input" type="text" id="presetName" placeholder="e.g. Standard Pre-Show" maxlength="80" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="presetDescription">Description</label>
+              <input class="form-input" type="text" id="presetDescription" placeholder="Optional notes about this preset" maxlength="200" />
+            </div>
+
+            <!-- Sections editor -->
+            <div class="sections-editor">
+              <div class="sections-editor-header">
+                <h3>Sections</h3>
+                <button class="btn btn-secondary" id="addSectionBtn" style="font-size:0.8rem;padding:0.35rem 0.8rem;">
+                  + Add Section
+                </button>
+              </div>
+
+              <!-- Column headers -->
+              <div style="display:grid;grid-template-columns:2rem 1fr 5rem 5rem 2.5rem;gap:0.5rem;padding:0 0.75rem;margin-bottom:0.3rem;">
+                <span></span>
+                <span style="font-size:0.7rem;color:var(--dazn-text-muted);text-transform:uppercase;letter-spacing:0.08em;">Section Name</span>
+                <span style="font-size:0.7rem;color:var(--dazn-text-muted);text-transform:uppercase;letter-spacing:0.08em;">Mins</span>
+                <span style="font-size:0.7rem;color:var(--dazn-text-muted);text-transform:uppercase;letter-spacing:0.08em;">Secs</span>
+                <span></span>
+              </div>
+
+              <div class="section-rows" id="sectionRows">
+                <!-- Rows injected by JS -->
+              </div>
+
+              <div class="section-total-display">
+                Total duration: <span id="totalDurationDisplay">00:00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Delete Confirm -->
+  <div class="confirm-overlay" id="deleteConfirmOverlay">
+    <div class="confirm-box">
+      <h3>⚠ Delete Preset</h3>
+      <p id="deleteConfirmText">Are you sure you want to delete this preset? This cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" id="deleteCancelBtn" style="font-size:0.9rem;padding:0.6rem 1.2rem;">
+          Cancel
+        </button>
+        <button class="btn btn-danger" id="deleteConfirmBtn" style="font-size:0.9rem;padding:0.6rem 1.5rem;min-width:auto;">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/js/presets.js"></script>
+</body>
+</html>

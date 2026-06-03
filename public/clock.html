@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FWC VoG Timing System</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-brand">
+      <svg class="logo" viewBox="0 0 80 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="DAZN">
+        <text x="0" y="20" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="22" fill="#F8FF00">DAZN</text>
+      </svg>
+      <div>
+        <div class="header-title" id="headerTitle">FWC VoG Timing System</div>
+        <div class="header-instance" id="headerInstance"></div>
+      </div>
+    </div>
+    <nav class="header-nav">
+      <a href="/" class="nav-btn active">
+        ⏱ <span class="nav-label">Clock</span>
+      </a>
+      <a href="/presets" class="nav-btn">
+        ☰ <span class="nav-label">Presets</span>
+      </a>
+    </nav>
+  </header>
+
+  <!-- Main -->
+  <main class="main-content">
+    <div class="clock-layout">
+
+      <!-- UTC Clock -->
+      <div class="utc-clock-panel">
+        <div class="utc-time" id="utcTime">--:--:--</div>
+        <div class="utc-label">UTC</div>
+        <div class="utc-date" id="utcDate">--</div>
+      </div>
+
+      <!-- Sections -->
+      <div class="sections-panel">
+        <div class="sections-header">
+          <h2>Running Order</h2>
+          <div style="display:flex;align-items:center;gap:0.75rem;">
+            <span class="preset-name-display" id="presetNameDisplay">No preset loaded</span>
+            <button class="btn btn-secondary" id="loadPresetBtn" style="font-size:0.75rem;padding:0.4rem 0.8rem;">
+              Load Preset
+            </button>
+          </div>
+        </div>
+
+        <div id="sectionsContainer">
+          <div class="no-preset">
+            <div class="no-preset-icon">📋</div>
+            <p>No preset loaded.</p>
+            <p>Load a preset to begin.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Totals -->
+      <div class="totals-panel">
+        <div class="total-remaining-block">
+          <div class="total-remaining-time" id="totalRemaining">--:--</div>
+          <div class="total-remaining-label">Total Remaining</div>
+        </div>
+
+        <div>
+          <div class="status-badge idle" id="statusBadge">Idle</div>
+        </div>
+
+        <div id="currentSectionBlock" style="display:none;">
+          <div style="font-size:0.7rem;color:var(--dazn-text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.3rem;">
+            Current Section
+          </div>
+          <div style="font-size:1.8rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--dazn-white);" id="currentSectionTime">--:--</div>
+          <div style="font-size:0.8rem;color:var(--dazn-text-muted);margin-top:0.2rem;" id="currentSectionName">--</div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="controls-panel">
+
+        <!-- Skip Back - deliberately subtle -->
+        <div class="override-group">
+          <span class="override-label">◀ Skip</span>
+          <button class="btn btn-override" id="skipPrevBtn" disabled title="Skip to previous section">PREV</button>
+        </div>
+
+        <!-- Pause/Resume -->
+        <button class="btn btn-warning hidden" id="pauseBtn">⏸ Pause</button>
+        <button class="btn btn-warning hidden" id="resumeBtn">▶ Resume</button>
+
+        <!-- Start -->
+        <button class="btn btn-primary" id="startBtn" disabled>▶ Start</button>
+
+        <!-- Reset -->
+        <button class="btn btn-danger" id="resetBtn" disabled>↺ Reset</button>
+
+        <!-- Skip Forward - deliberately subtle -->
+        <div class="override-group">
+          <span class="override-label">Skip ▶</span>
+          <button class="btn btn-override" id="skipNextBtn" disabled title="Skip to next section">NEXT</button>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Load Preset Modal -->
+  <div class="modal-overlay" id="loadPresetModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Load Preset</h3>
+        <button class="modal-close" id="closeModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <ul class="preset-list-modal" id="presetListModal">
+          <li style="padding:1rem;color:var(--dazn-text-muted);font-size:0.85rem;">Loading presets...</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelModalBtn" style="font-size:0.85rem;padding:0.5rem 1rem;">Cancel</button>
+        <button class="btn btn-primary" id="confirmLoadBtn" disabled style="font-size:0.85rem;padding:0.5rem 1.5rem;min-width:auto;">
+          Load Selected
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Replace Modal -->
+  <div class="confirm-overlay" id="confirmReplaceOverlay">
+    <div class="confirm-box">
+      <h3>⚠ Timer is Running</h3>
+      <p>A timer is currently active. Loading a new preset will stop and reset the current timer. Are you sure?</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" id="confirmReplaceCancel" style="font-size:0.9rem;padding:0.6rem 1.2rem;">
+          Cancel
+        </button>
+        <button class="btn btn-danger" id="confirmReplaceOk" style="font-size:0.9rem;padding:0.6rem 1.5rem;min-width:auto;">
+          Load Anyway
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/clock.js"></script>
+</body>
+</html>
