@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   fwc-vog-timing-team1:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/${GITHUB_OWNER}/fwc-timer:latest
     container_name: ${CONTAINER_NAME:-fwc-vog-timing-team1}
     restart: unless-stopped
     ports:
@@ -15,8 +13,6 @@ services:
       - NODE_ENV=production
       - INSTANCE_NAME=${INSTANCE_NAME:-FWC VoG Timing System - Team 1}
       - INSTANCE_COLOR=${INSTANCE_COLOR:-#F8FF00}
-      - DOCKER_BUILDKIT=0
-      - COMPOSE_DOCKER_CLI_BUILD=0
 
 volumes:
   vog_data_team1:
