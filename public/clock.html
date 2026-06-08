@@ -21,103 +21,196 @@
         <div class="header-instance" id="headerInstance"></div>
       </div>
     </div>
-    <nav class="header-nav">
-      <a href="/" class="nav-btn active">
-        ⏱ <span class="nav-label">Clock</span>
-      </a>
-      <a href="/presets" class="nav-btn">
-        ☰ <span class="nav-label">Presets</span>
-      </a>
-    </nav>
+    <div class="header-right">
+      <div class="utc-header-block">
+        <span class="utc-header-time" id="utcTime">--:--:--</span>
+        <span class="utc-header-label">UTC</span>
+        <span class="utc-header-date" id="utcDate">--</span>
+      </div>
+      <nav class="header-nav">
+        <a href="/" class="nav-btn active">⏱ <span class="nav-label">Clock</span></a>
+        <a href="/presets" class="nav-btn">☰ <span class="nav-label">Presets</span></a>
+      </nav>
+    </div>
   </header>
 
-  <!-- Main -->
-  <main class="main-content">
-    <div class="clock-layout">
+  <!-- Main quad-timer layout -->
+  <main class="main-content quad-layout">
 
-      <!-- UTC Clock -->
-      <div class="utc-clock-panel">
-        <div class="utc-time" id="utcTime">--:--:--</div>
-        <div class="utc-label">UTC</div>
-        <div class="utc-date" id="utcDate">--</div>
+    <!-- PRIMARY TIMER (left half) -->
+    <div class="timer-panel timer-panel--primary" data-timer-id="primary">
+      <div class="timer-panel-header">
+        <span class="timer-panel-label">PRIMARY</span>
+        <span class="preset-name-display" id="presetName-primary">No preset loaded</span>
+        <button class="btn btn-secondary btn-sm" data-load-for="primary">Load Preset</button>
       </div>
 
-      <!-- Sections -->
-      <div class="sections-panel">
-        <div class="sections-header">
-          <h2>Running Order</h2>
-          <div style="display:flex;align-items:center;gap:0.75rem;">
-            <span class="preset-name-display" id="presetNameDisplay">No preset loaded</span>
-            <button class="btn btn-secondary" id="loadPresetBtn" style="font-size:0.75rem;padding:0.4rem 0.8rem;">
-              Load Preset
-            </button>
-          </div>
-        </div>
-
-        <div id="sectionsContainer">
-          <div class="no-preset">
-            <div class="no-preset-icon">📋</div>
-            <p>No preset loaded.</p>
-            <p>Load a preset to begin.</p>
-          </div>
+      <div class="timer-sections-wrap">
+        <div class="sections-container" id="sections-primary">
+          <div class="no-preset"><div class="no-preset-icon">📋</div><p>No preset loaded.</p></div>
         </div>
       </div>
 
-      <!-- Totals -->
-      <div class="totals-panel">
-        <div class="total-remaining-block">
-          <div class="total-remaining-time" id="totalRemaining">--:--</div>
-          <div class="total-remaining-label">Total Remaining</div>
-        </div>
-
-        <div>
-          <div class="status-badge idle" id="statusBadge">Idle</div>
-        </div>
-
-        <div id="currentSectionBlock" style="display:none;">
-          <div style="font-size:0.7rem;color:var(--dazn-text-muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.3rem;">
-            Current Section
-          </div>
-          <div style="font-size:1.8rem;font-weight:800;font-variant-numeric:tabular-nums;color:var(--dazn-white);" id="currentSectionTime">--:--</div>
-          <div style="font-size:0.8rem;color:var(--dazn-text-muted);margin-top:0.2rem;" id="currentSectionName">--</div>
+      <div class="timer-totals">
+        <div class="total-remaining-time" id="totalRemaining-primary">--:--</div>
+        <div class="total-remaining-label">Total Remaining</div>
+        <div class="status-badge idle" id="statusBadge-primary">Idle</div>
+        <div class="current-section-block" id="currentSectionBlock-primary" style="display:none;">
+          <div class="current-section-time" id="currentSectionTime-primary">--:--</div>
+          <div class="current-section-name" id="currentSectionName-primary">--</div>
         </div>
       </div>
 
-      <!-- Controls -->
-      <div class="controls-panel">
-
-        <!-- Skip Back - deliberately subtle -->
+      <div class="timer-controls">
         <div class="override-group">
           <span class="override-label">◀ Skip</span>
-          <button class="btn btn-override" id="skipPrevBtn" disabled title="Skip to previous section">PREV</button>
+          <button class="btn btn-override" data-action="skipPrev" data-timer="primary" disabled>PREV</button>
         </div>
-
-        <!-- Pause/Resume -->
-        <button class="btn btn-warning hidden" id="pauseBtn">⏸ Pause</button>
-        <button class="btn btn-warning hidden" id="resumeBtn">▶ Resume</button>
-
-        <!-- Start -->
-        <button class="btn btn-primary" id="startBtn" disabled>▶ Start</button>
-
-        <!-- Reset -->
-        <button class="btn btn-danger" id="resetBtn" disabled>↺ Reset</button>
-
-        <!-- Skip Forward - deliberately subtle -->
+        <button class="btn btn-warning hidden" data-action="pause"   data-timer="primary">⏸ Pause</button>
+        <button class="btn btn-warning hidden" data-action="resume"  data-timer="primary">▶ Resume</button>
+        <button class="btn btn-primary"        data-action="start"   data-timer="primary" disabled>▶ Start</button>
+        <button class="btn btn-danger"         data-action="reset"   data-timer="primary" disabled>↺ Reset</button>
         <div class="override-group">
           <span class="override-label">Skip ▶</span>
-          <button class="btn btn-override" id="skipNextBtn" disabled title="Skip to next section">NEXT</button>
+          <button class="btn btn-override" data-action="skipNext" data-timer="primary" disabled>NEXT</button>
         </div>
+      </div>
+    </div>
 
+    <!-- SECONDARY TIMERS (right half, stacked) -->
+    <div class="secondary-column">
+
+      <!-- SECONDARY 1 -->
+      <div class="timer-panel timer-panel--secondary" data-timer-id="secondary-1">
+        <div class="timer-panel-header">
+          <span class="timer-panel-label">TIMER 2</span>
+          <span class="preset-name-display" id="presetName-secondary-1">No preset loaded</span>
+          <button class="btn btn-secondary btn-sm" data-load-for="secondary-1">Load Preset</button>
+        </div>
+        <div class="secondary-body">
+          <div class="secondary-sections-wrap">
+            <div class="sections-container sections-container--compact" id="sections-secondary-1">
+              <div class="no-preset"><div class="no-preset-icon">📋</div><p>No preset loaded.</p></div>
+            </div>
+          </div>
+          <div class="secondary-right">
+            <div class="timer-totals timer-totals--compact">
+              <div class="total-remaining-time" id="totalRemaining-secondary-1">--:--</div>
+              <div class="total-remaining-label">Remaining</div>
+              <div class="status-badge idle" id="statusBadge-secondary-1">Idle</div>
+              <div class="current-section-block" id="currentSectionBlock-secondary-1" style="display:none;">
+                <div class="current-section-time" id="currentSectionTime-secondary-1">--:--</div>
+                <div class="current-section-name" id="currentSectionName-secondary-1">--</div>
+              </div>
+            </div>
+            <div class="timer-controls timer-controls--compact">
+              <div class="override-group">
+                <span class="override-label">◀</span>
+                <button class="btn btn-override btn-override--xs" data-action="skipPrev" data-timer="secondary-1" disabled>PREV</button>
+              </div>
+              <button class="btn btn-warning btn-sm hidden" data-action="pause"  data-timer="secondary-1">⏸</button>
+              <button class="btn btn-warning btn-sm hidden" data-action="resume" data-timer="secondary-1">▶</button>
+              <button class="btn btn-primary  btn-sm"       data-action="start"  data-timer="secondary-1" disabled>▶ Start</button>
+              <button class="btn btn-danger   btn-sm"       data-action="reset"  data-timer="secondary-1" disabled>↺</button>
+              <div class="override-group">
+                <span class="override-label">▶</span>
+                <button class="btn btn-override btn-override--xs" data-action="skipNext" data-timer="secondary-1" disabled>NEXT</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-    </div>
+      <!-- SECONDARY 2 -->
+      <div class="timer-panel timer-panel--secondary" data-timer-id="secondary-2">
+        <div class="timer-panel-header">
+          <span class="timer-panel-label">TIMER 3</span>
+          <span class="preset-name-display" id="presetName-secondary-2">No preset loaded</span>
+          <button class="btn btn-secondary btn-sm" data-load-for="secondary-2">Load Preset</button>
+        </div>
+        <div class="secondary-body">
+          <div class="secondary-sections-wrap">
+            <div class="sections-container sections-container--compact" id="sections-secondary-2">
+              <div class="no-preset"><div class="no-preset-icon">📋</div><p>No preset loaded.</p></div>
+            </div>
+          </div>
+          <div class="secondary-right">
+            <div class="timer-totals timer-totals--compact">
+              <div class="total-remaining-time" id="totalRemaining-secondary-2">--:--</div>
+              <div class="total-remaining-label">Remaining</div>
+              <div class="status-badge idle" id="statusBadge-secondary-2">Idle</div>
+              <div class="current-section-block" id="currentSectionBlock-secondary-2" style="display:none;">
+                <div class="current-section-time" id="currentSectionTime-secondary-2">--:--</div>
+                <div class="current-section-name" id="currentSectionName-secondary-2">--</div>
+              </div>
+            </div>
+            <div class="timer-controls timer-controls--compact">
+              <div class="override-group">
+                <span class="override-label">◀</span>
+                <button class="btn btn-override btn-override--xs" data-action="skipPrev" data-timer="secondary-2" disabled>PREV</button>
+              </div>
+              <button class="btn btn-warning btn-sm hidden" data-action="pause"  data-timer="secondary-2">⏸</button>
+              <button class="btn btn-warning btn-sm hidden" data-action="resume" data-timer="secondary-2">▶</button>
+              <button class="btn btn-primary  btn-sm"       data-action="start"  data-timer="secondary-2" disabled>▶ Start</button>
+              <button class="btn btn-danger   btn-sm"       data-action="reset"  data-timer="secondary-2" disabled>↺</button>
+              <div class="override-group">
+                <span class="override-label">▶</span>
+                <button class="btn btn-override btn-override--xs" data-action="skipNext" data-timer="secondary-2" disabled>NEXT</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECONDARY 3 -->
+      <div class="timer-panel timer-panel--secondary" data-timer-id="secondary-3">
+        <div class="timer-panel-header">
+          <span class="timer-panel-label">TIMER 4</span>
+          <span class="preset-name-display" id="presetName-secondary-3">No preset loaded</span>
+          <button class="btn btn-secondary btn-sm" data-load-for="secondary-3">Load Preset</button>
+        </div>
+        <div class="secondary-body">
+          <div class="secondary-sections-wrap">
+            <div class="sections-container sections-container--compact" id="sections-secondary-3">
+              <div class="no-preset"><div class="no-preset-icon">📋</div><p>No preset loaded.</p></div>
+            </div>
+          </div>
+          <div class="secondary-right">
+            <div class="timer-totals timer-totals--compact">
+              <div class="total-remaining-time" id="totalRemaining-secondary-3">--:--</div>
+              <div class="total-remaining-label">Remaining</div>
+              <div class="status-badge idle" id="statusBadge-secondary-3">Idle</div>
+              <div class="current-section-block" id="currentSectionBlock-secondary-3" style="display:none;">
+                <div class="current-section-time" id="currentSectionTime-secondary-3">--:--</div>
+                <div class="current-section-name" id="currentSectionName-secondary-3">--</div>
+              </div>
+            </div>
+            <div class="timer-controls timer-controls--compact">
+              <div class="override-group">
+                <span class="override-label">◀</span>
+                <button class="btn btn-override btn-override--xs" data-action="skipPrev" data-timer="secondary-3" disabled>PREV</button>
+              </div>
+              <button class="btn btn-warning btn-sm hidden" data-action="pause"  data-timer="secondary-3">⏸</button>
+              <button class="btn btn-warning btn-sm hidden" data-action="resume" data-timer="secondary-3">▶</button>
+              <button class="btn btn-primary  btn-sm"       data-action="start"  data-timer="secondary-3" disabled>▶ Start</button>
+              <button class="btn btn-danger   btn-sm"       data-action="reset"  data-timer="secondary-3" disabled>↺</button>
+              <div class="override-group">
+                <span class="override-label">▶</span>
+                <button class="btn btn-override btn-override--xs" data-action="skipNext" data-timer="secondary-3" disabled>NEXT</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /secondary-column -->
   </main>
 
-  <!-- Load Preset Modal -->
+  <!-- Shared Load Preset Modal -->
   <div class="modal-overlay" id="loadPresetModal">
     <div class="modal">
       <div class="modal-header">
-        <h3>Load Preset</h3>
+        <h3>Load Preset — <span id="modalTimerLabel">Timer</span></h3>
         <button class="modal-close" id="closeModalBtn">✕</button>
       </div>
       <div class="modal-body">
@@ -127,9 +220,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" id="cancelModalBtn" style="font-size:0.85rem;padding:0.5rem 1rem;">Cancel</button>
-        <button class="btn btn-primary" id="confirmLoadBtn" disabled style="font-size:0.85rem;padding:0.5rem 1.5rem;min-width:auto;">
-          Load Selected
-        </button>
+        <button class="btn btn-primary" id="confirmLoadBtn" disabled style="font-size:0.85rem;padding:0.5rem 1.5rem;min-width:auto;">Load Selected</button>
       </div>
     </div>
   </div>
@@ -138,14 +229,10 @@
   <div class="confirm-overlay" id="confirmReplaceOverlay">
     <div class="confirm-box">
       <h3>⚠ Timer is Running</h3>
-      <p>A timer is currently active. Loading a new preset will stop and reset the current timer. Are you sure?</p>
+      <p>This timer is currently active. Loading a new preset will stop and reset it. Are you sure?</p>
       <div class="confirm-actions">
-        <button class="btn btn-secondary" id="confirmReplaceCancel" style="font-size:0.9rem;padding:0.6rem 1.2rem;">
-          Cancel
-        </button>
-        <button class="btn btn-danger" id="confirmReplaceOk" style="font-size:0.9rem;padding:0.6rem 1.5rem;min-width:auto;">
-          Load Anyway
-        </button>
+        <button class="btn btn-secondary" id="confirmReplaceCancel" style="font-size:0.9rem;padding:0.6rem 1.2rem;">Cancel</button>
+        <button class="btn btn-danger"    id="confirmReplaceOk"     style="font-size:0.9rem;padding:0.6rem 1.5rem;min-width:auto;">Load Anyway</button>
       </div>
     </div>
   </div>
