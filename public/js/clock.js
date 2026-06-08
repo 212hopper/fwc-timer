@@ -22,6 +22,9 @@
   // ── DOM refs ───────────────────────────────────────────────────────────────
   const utcTimeEl             = document.getElementById('utcTime');
   const utcDateEl             = document.getElementById('utcDate');
+  const dallasTimeEl          = document.getElementById('dallasTime');
+  const dallasDateEl          = document.getElementById('dallasDate');
+  const dallasLabelEl         = document.getElementById('dallasLabel');
   const headerTitle           = document.getElementById('headerTitle');
   const headerInstance        = document.getElementById('headerInstance');
   const loadPresetModal       = document.getElementById('loadPresetModal');
@@ -51,9 +54,11 @@
     })
     .catch(() => {});
 
-  // ── UTC Clock ──────────────────────────────────────────────────────────────
-  function updateUtcClock() {
+  // ── Clocks (UTC + Dallas CT) ───────────────────────────────────────────────
+  function updateClocks() {
     const now = new Date();
+
+    // UTC
     const hh = String(now.getUTCHours()).padStart(2, '0');
     const mm = String(now.getUTCMinutes()).padStart(2, '0');
     const ss = String(now.getUTCSeconds()).padStart(2, '0');
@@ -61,9 +66,32 @@
     const days   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     utcDateEl.textContent = `${days[now.getUTCDay()]} ${now.getUTCDate()} ${months[now.getUTCMonth()]} ${now.getUTCFullYear()}`;
+
+    // Dallas — America/Chicago (auto CDT/CST)
+    try {
+      const p = {};
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Chicago',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false,
+        weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+      }).formatToParts(now).forEach(({ type, value }) => { p[type] = value; });
+
+      dallasTimeEl.textContent = `${p.hour}:${p.minute}:${p.second}`;
+      dallasDateEl.textContent = `${p.weekday} ${p.day} ${p.month} ${p.year}`;
+
+      const tzAbbr = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Chicago',
+        timeZoneName: 'short'
+      }).formatToParts(now).find(x => x.type === 'timeZoneName')?.value || 'CT';
+      if (dallasLabelEl) dallasLabelEl.textContent = `Dallas · ${tzAbbr}`;
+    } catch (e) {
+      if (dallasTimeEl) dallasTimeEl.textContent = '--:--:--';
+    }
   }
-  updateUtcClock();
-  setInterval(updateUtcClock, 1000);
+
+  updateClocks();
+  setInterval(updateClocks, 1000);
 
   // ── Helpers ────────────────────────────────────────────────────────────────
   function formatTime(totalSeconds) {
@@ -114,7 +142,7 @@
     const nameEl = document.getElementById(`presetName-${id}`);
     if (nameEl) nameEl.textContent = state.presetName || 'No preset loaded';
 
-    // Total remaining
+    // Total remaining — now the SECONDARY smaller number
     const totalEl = document.getElementById(`totalRemaining-${id}`);
     if (totalEl) {
       if (isIdle)          totalEl.textContent = formatTime(state.totalDuration);
@@ -130,16 +158,26 @@
       badgeEl.textContent = labels[state.status] || state.status;
     }
 
-    // Current section block
+    // Current section block — now the PRIMARY large number
+    // Always visible when a preset is loaded; shows first section preview when idle
     const csBlock = document.getElementById(`currentSectionBlock-${id}`);
     const csTime  = document.getElementById(`currentSectionTime-${id}`);
     const csName  = document.getElementById(`currentSectionName-${id}`);
     if (csBlock) {
-      if ((isRunning || isPaused) && hasPreset) {
+      if (hasPreset) {
         csBlock.style.display = 'block';
-        const section = state.sections[state.currentSectionIndex];
-        if (csTime) csTime.textContent = formatTime(state.currentSectionRemaining);
-        if (csName) csName.textContent = section ? section.name : '--';
+        if (isRunning || isPaused) {
+          const section = state.sections[state.currentSectionIndex];
+          if (csTime) csTime.textContent = formatTime(state.currentSectionRemaining);
+          if (csName) csName.textContent = section ? section.name : '--';
+        } else if (isFinished) {
+          if (csTime) csTime.textContent = '00:00';
+          if (csName) csName.textContent = state.sections[state.sections.length - 1]?.name || '--';
+        } else {
+          // idle — preview first section
+          if (csTime) csTime.textContent = formatTime(state.sections[0]?.duration_seconds);
+          if (csName) csName.textContent = state.sections[0]?.name || '--';
+        }
       } else {
         csBlock.style.display = 'none';
       }
@@ -149,7 +187,7 @@
     const container = document.getElementById(`sections-${id}`);
     if (container) renderSections(state, container);
 
-    // Controls — use data attributes to find buttons scoped to this timer
+    // Controls
     const panel = document.querySelector(`[data-timer-id="${id}"]`);
     if (!panel) return;
 
@@ -169,12 +207,13 @@
     if (resetBtn) {
       resetBtn.disabled = isIdle && !hasPreset;
     }
-    if (pauseBtn)  pauseBtn.classList.toggle('hidden', !isRunning);
-    if (resumeBtn) resumeBtn.classList.toggle('hidden', !isPaused);
+    if (pauseBtn)    pauseBtn.classList.toggle('hidden', !isRunning);
+    if (resumeBtn)   resumeBtn.classList.toggle('hidden', !isPaused);
     if (skipNextBtn) skipNextBtn.disabled = !hasPreset || isIdle || isFinished;
     if (skipPrevBtn) skipPrevBtn.disabled = !hasPreset || isIdle || isFinished || state.currentSectionIndex === 0;
   }
 
+  // ── Render sections list ───────────────────────────────────────────────────
   function renderSections(state, container) {
     if (!state.sections || state.sections.length === 0) {
       container.innerHTML = `
@@ -303,8 +342,8 @@
   });
 
   function openLoadModal(timerId) {
-    modalTargetTimerId = timerId;
-    selectedPresetId   = null;
+    modalTargetTimerId      = timerId;
+    selectedPresetId        = null;
     confirmLoadBtn.disabled = true;
     modalTimerLabel.textContent = TIMER_LABELS[timerId] || timerId;
     presetListModal.innerHTML = '<li style="padding:1rem;color:var(--dazn-text-muted);font-size:0.85rem;">Loading...</li>';
@@ -334,11 +373,11 @@
           li.addEventListener('click', () => {
             document.querySelectorAll('.preset-list-item').forEach(el => el.classList.remove('selected'));
             li.classList.add('selected');
-            selectedPresetId = preset.id;
+            selectedPresetId        = preset.id;
             confirmLoadBtn.disabled = false;
           });
           li.addEventListener('dblclick', () => {
-            selectedPresetId = preset.id;
+            selectedPresetId        = preset.id;
             confirmLoadBtn.disabled = false;
             handleLoadConfirm();
           });
@@ -360,7 +399,7 @@
 
   function handleLoadConfirm() {
     if (!selectedPresetId || !modalTargetTimerId) return;
-    const state = timerStates[modalTargetTimerId];
+    const state    = timerStates[modalTargetTimerId];
     const isActive = state && (state.status === 'running' || state.status === 'paused');
 
     if (isActive) {

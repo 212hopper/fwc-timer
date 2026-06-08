@@ -14,12 +14,12 @@
   --accent:           var(--dazn-yellow);
   --font-main:        'Inter', 'Helvetica Neue', Arial, sans-serif;
 
-  --section-past:     #1A1A1A;
-  --section-active:   #F8FF00;
-  --section-future:   #2D2D2D;
-  --section-past-text:    #555555;
-  --section-active-text:  #000000;
-  --section-future-text:  #CCCCCC;
+  --section-past:          #1A1A1A;
+  --section-active:        #F8FF00;
+  --section-future:        #2D2D2D;
+  --section-past-text:     #555555;
+  --section-active-text:   #000000;
+  --section-future-text:   #CCCCCC;
 }
 
 /* ── Reset & Base ────────────────────────────────────────────────────────── */
@@ -81,6 +81,12 @@ a:hover { text-decoration: underline; }
   font-weight: 600;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
 .header-nav {
   display: flex;
   gap: 0.5rem;
@@ -109,6 +115,56 @@ a:hover { text-decoration: underline; }
   text-decoration: none;
 }
 
+/* ── Dual clock header block ─────────────────────────────────────────────── */
+.header-clocks {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-clock-block {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.header-clock-time {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--dazn-white);
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.header-clock-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.header-clock-label {
+  font-size: 0.6rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.header-clock-date {
+  font-size: 0.6rem;
+  color: var(--dazn-text-muted);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.header-clock-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--dazn-light-grey);
+  flex-shrink: 0;
+}
+
 /* ── Main Layout ─────────────────────────────────────────────────────────── */
 .main-content {
   flex: 1;
@@ -118,75 +174,298 @@ a:hover { text-decoration: underline; }
   width: 100%;
 }
 
-/* ── Clock Page ──────────────────────────────────────────────────────────── */
-.clock-layout {
+/* ── Quad Timer Layout ───────────────────────────────────────────────────── */
+.quad-layout {
+  max-width: 100%;
+  padding: 0.75rem;
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  gap: 1.5rem;
-  align-items: start;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  height: calc(100vh - 60px);
+  box-sizing: border-box;
 }
 
-/* UTC Clock */
-.utc-clock-panel {
+/* Secondary column stacks 3 panels vertically */
+.secondary-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+}
+
+/* ── Timer Panel Base ────────────────────────────────────────────────────── */
+.timer-panel {
   background: var(--dazn-dark-grey);
   border: 1px solid var(--dazn-light-grey);
   border-radius: 8px;
-  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Primary takes full left column height */
+.timer-panel--primary {
+  height: 100%;
+}
+
+/* Each secondary takes equal share of right column */
+.timer-panel--secondary {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Active panel highlight */
+.timer-panel:has(.status-badge.running) {
+  border-color: var(--dazn-success);
+  box-shadow: 0 0 0 1px var(--dazn-success);
+}
+
+.timer-panel:has(.status-badge.paused) {
+  border-color: var(--dazn-warning);
+}
+
+.timer-panel:has(.status-badge.finished) {
+  border-color: var(--dazn-danger);
+}
+
+/* ── Panel Header ────────────────────────────────────────────────────────── */
+.timer-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--dazn-light-grey);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.timer-panel-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.timer-panel-header .preset-name-display {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--dazn-white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Primary Panel internals ─────────────────────────────────────────────── */
+.timer-sections-wrap {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.timer-totals {
+  padding: 1rem;
+  border-top: 1px solid var(--dazn-light-grey);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+/* Current section is now the PRIMARY large accent number */
+.current-section-block {
   text-align: center;
 }
 
-.utc-time {
-  font-size: 2.8rem;
+.current-section-time {
+  font-size: 1.6rem;
   font-weight: 800;
-  letter-spacing: 0.05em;
-  color: var(--dazn-white);
   font-variant-numeric: tabular-nums;
+  color: var(--accent);
   line-height: 1;
 }
 
-.utc-label {
-  font-size: 0.7rem;
+/* Primary panel gets an even larger current section time */
+.current-section-time--primary {
+  font-size: 2.4rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.current-section-name {
+  font-size: 0.75rem;
+  color: var(--dazn-text-muted);
+  margin-top: 0.2rem;
+}
+
+/* Total remaining is now the SECONDARY smaller white number */
+.total-remaining-time {
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+}
+
+.total-remaining-time--secondary {
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  color: var(--dazn-white) !important;
+  letter-spacing: 0.03em;
+}
+
+.total-remaining-label {
+  font-size: 0.65rem;
   color: var(--dazn-text-muted);
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  margin-top: 0.5rem;
 }
 
-.utc-date {
-  font-size: 0.8rem;
-  color: var(--dazn-text-muted);
-  margin-top: 0.25rem;
+.status-badge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-/* Sections Panel */
-.sections-panel {
-  background: var(--dazn-dark-grey);
-  border: 1px solid var(--dazn-light-grey);
-  border-radius: 8px;
+.status-badge.idle     { background: var(--dazn-light-grey); color: var(--dazn-text-muted); }
+.status-badge.running  { background: var(--dazn-success);    color: var(--dazn-black); }
+.status-badge.paused   { background: var(--dazn-warning);    color: var(--dazn-black); }
+.status-badge.finished { background: var(--dazn-danger);     color: var(--dazn-white); }
+
+/* Primary controls */
+.timer-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--dazn-light-grey);
+  flex-shrink: 0;
+}
+
+/* ── Secondary Panel internals ───────────────────────────────────────────── */
+.secondary-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
-.sections-header {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--dazn-light-grey);
+.secondary-sections-wrap {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  border-right: 1px solid var(--dazn-light-grey);
+}
+
+.sections-container--compact .sections-list .section-item {
+  padding: 0.5rem 0.75rem;
+  gap: 0.5rem;
+}
+
+.sections-container--compact .section-name {
+  font-size: 0.8rem;
+}
+
+.sections-container--compact .section-duration {
+  font-size: 0.8rem;
+  min-width: 3.5rem;
+}
+
+.sections-container--compact .section-index {
+  font-size: 0.65rem;
+  width: 1.2rem;
+}
+
+.sections-container--compact .no-preset {
+  padding: 1rem;
+}
+
+.sections-container--compact .no-preset-icon {
+  font-size: 1.5rem;
+}
+
+.sections-container--compact .no-preset p {
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Right side of secondary: totals + controls stacked */
+.secondary-right {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  width: 180px;
+  flex-shrink: 0;
+}
+
+.timer-totals--compact {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--dazn-light-grey);
+  gap: 0.3rem;
+}
+
+/* Secondary compact: current section is the big accent number */
+.timer-totals--compact .current-section-time {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.timer-totals--compact .current-section-name {
+  font-size: 0.65rem;
+  color: var(--dazn-text-muted);
+  margin-top: 0.1rem;
+}
+
+/* Secondary compact: total remaining is the small muted number */
+.timer-totals--compact .total-remaining-time--secondary {
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: var(--dazn-white) !important;
+}
+
+.timer-totals--compact .total-remaining-label {
+  font-size: 0.55rem;
+}
+
+/* Compact controls for secondary timers */
+.timer-controls--compact {
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  border-top: none;
+}
+
+.timer-controls--compact .override-group {
+  flex-direction: row;
+  gap: 0.3rem;
   align-items: center;
 }
 
-.sections-header h2 {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--dazn-text-muted);
+.timer-controls--compact .override-label {
+  font-size: 0.55rem;
+  width: 1rem;
+  text-align: center;
 }
 
-.preset-name-display {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--accent);
-}
-
+/* ── Sections list ───────────────────────────────────────────────────────── */
 .sections-list {
   list-style: none;
 }
@@ -237,7 +516,7 @@ a:hover { text-decoration: underline; }
   opacity: 0.5;
 }
 .section-item.past .section-name,
-.section-item.past .section-duration { color: var(--section-past-text); }
+.section-item.past .section-duration    { color: var(--section-past-text); }
 .section-item.past .section-status-icon { color: var(--dazn-success); }
 
 .section-item.active {
@@ -245,20 +524,20 @@ a:hover { text-decoration: underline; }
 }
 .section-item.active .section-name,
 .section-item.active .section-duration,
-.section-item.active .section-index { color: var(--section-active-text); }
+.section-item.active .section-index     { color: var(--section-active-text); }
 .section-item.active .section-status-icon { color: var(--section-active-text); }
 
 .section-item.future {
   background: var(--section-future);
 }
 .section-item.future .section-name,
-.section-item.future .section-duration { color: var(--section-future-text); }
+.section-item.future .section-duration  { color: var(--section-future-text); }
 
 .section-item.idle {
   background: var(--section-future);
 }
 .section-item.idle .section-name,
-.section-item.idle .section-duration { color: var(--section-future-text); }
+.section-item.idle .section-duration    { color: var(--section-future-text); }
 
 /* No preset loaded state */
 .no-preset {
@@ -275,66 +554,10 @@ a:hover { text-decoration: underline; }
 
 .no-preset p {
   font-size: 0.9rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
-/* ── Total Remaining Panel ───────────────────────────────────────────────── */
-.totals-panel {
-  background: var(--dazn-dark-grey);
-  border: 1px solid var(--dazn-light-grey);
-  border-radius: 8px;
-  padding: 1.5rem 1rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.total-remaining-block {}
-
-.total-remaining-time {
-  font-size: 2.8rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-.total-remaining-label {
-  font-size: 0.7rem;
-  color: var(--dazn-text-muted);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-top: 0.5rem;
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.status-badge.idle     { background: var(--dazn-light-grey); color: var(--dazn-text-muted); }
-.status-badge.running  { background: var(--dazn-success); color: var(--dazn-black); }
-.status-badge.paused   { background: var(--dazn-warning); color: var(--dazn-black); }
-.status-badge.finished { background: var(--dazn-danger); color: var(--dazn-white); }
-
-/* ── Control Buttons ─────────────────────────────────────────────────────── */
-.controls-panel {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 1rem 0;
-}
-
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -356,7 +579,6 @@ a:hover { text-decoration: underline; }
   cursor: not-allowed;
 }
 
-/* Primary - Start */
 .btn-primary {
   background: var(--dazn-success);
   color: var(--dazn-black);
@@ -366,7 +588,6 @@ a:hover { text-decoration: underline; }
 }
 .btn-primary:hover:not(:disabled) { filter: brightness(1.15); }
 
-/* Danger - Reset */
 .btn-danger {
   background: var(--dazn-danger);
   color: var(--dazn-white);
@@ -376,7 +597,6 @@ a:hover { text-decoration: underline; }
 }
 .btn-danger:hover:not(:disabled) { filter: brightness(1.15); }
 
-/* Warning - Pause/Resume */
 .btn-warning {
   background: var(--dazn-warning);
   color: var(--dazn-black);
@@ -386,7 +606,15 @@ a:hover { text-decoration: underline; }
 }
 .btn-warning:hover:not(:disabled) { filter: brightness(1.15); }
 
-/* Override buttons - deliberately small and subtle */
+.btn-secondary {
+  background: transparent;
+  color: var(--dazn-white);
+  border: 1px solid var(--dazn-light-grey);
+  font-size: 0.9rem;
+  padding: 0.6rem 1.2rem;
+}
+.btn-secondary:hover:not(:disabled) { background: var(--dazn-light-grey); }
+
 .btn-override {
   background: transparent;
   color: var(--dazn-text-muted);
@@ -399,6 +627,18 @@ a:hover { text-decoration: underline; }
 .btn-override:hover:not(:disabled) {
   background: var(--dazn-light-grey);
   color: var(--dazn-white);
+}
+
+/* Small button variant */
+.btn-sm {
+  font-size: 0.7rem !important;
+  padding: 0.35rem 0.7rem !important;
+  min-width: unset !important;
+}
+
+.btn-override--xs {
+  font-size: 0.6rem;
+  padding: 0.25rem 0.5rem;
 }
 
 .override-group {
@@ -415,19 +655,7 @@ a:hover { text-decoration: underline; }
   text-transform: uppercase;
 }
 
-/* Load preset button on clock page */
-.btn-secondary {
-  background: transparent;
-  color: var(--dazn-white);
-  border: 1px solid var(--dazn-light-grey);
-  font-size: 0.9rem;
-  padding: 0.6rem 1.2rem;
-}
-.btn-secondary:hover:not(:disabled) {
-  background: var(--dazn-light-grey);
-}
-
-/* ── Load Preset Modal ───────────────────────────────────────────────────── */
+/* ── Modals ──────────────────────────────────────────────────────────────── */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -439,9 +667,7 @@ a:hover { text-decoration: underline; }
   padding: 1rem;
 }
 
-.modal-overlay.open {
-  display: flex;
-}
+.modal-overlay.open { display: flex; }
 
 .modal {
   background: var(--dazn-dark-grey);
@@ -497,7 +723,6 @@ a:hover { text-decoration: underline; }
   flex-shrink: 0;
 }
 
-/* Preset list in modal */
 .preset-list-modal {
   list-style: none;
   display: flex;
@@ -514,27 +739,11 @@ a:hover { text-decoration: underline; }
   transition: all 0.2s;
 }
 
-.preset-list-item:hover {
-  border-color: var(--accent);
-}
+.preset-list-item:hover          { border-color: var(--accent); }
+.preset-list-item.selected       { border-color: var(--accent); background: rgba(248,255,0,0.08); }
+.preset-list-item .preset-item-name { font-weight: 600; font-size: 0.95rem; }
+.preset-list-item .preset-item-meta { font-size: 0.75rem; color: var(--dazn-text-muted); margin-top: 0.25rem; }
 
-.preset-list-item.selected {
-  border-color: var(--accent);
-  background: rgba(248, 255, 0, 0.08);
-}
-
-.preset-list-item .preset-item-name {
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.preset-list-item .preset-item-meta {
-  font-size: 0.75rem;
-  color: var(--dazn-text-muted);
-  margin-top: 0.25rem;
-}
-
-/* Confirm dialog */
 .confirm-overlay {
   display: none;
   position: fixed;
@@ -628,7 +837,7 @@ a:hover { text-decoration: underline; }
 .preset-sidebar-item:hover { background: var(--dazn-mid-grey); }
 
 .preset-sidebar-item.active {
-  background: rgba(248, 255, 0, 0.08);
+  background: rgba(248,255,0,0.08);
   border-left: 3px solid var(--accent);
 }
 
@@ -662,10 +871,9 @@ a:hover { text-decoration: underline; }
   font-size: 0.85rem;
   transition: all 0.2s;
 }
-.btn-icon:hover { background: var(--dazn-light-grey); color: var(--dazn-white); }
-.btn-icon.danger:hover { background: var(--dazn-danger); color: var(--dazn-white); }
+.btn-icon:hover              { background: var(--dazn-light-grey); color: var(--dazn-white); }
+.btn-icon.danger:hover       { background: var(--dazn-danger);     color: var(--dazn-white); }
 
-/* Preset Editor */
 .preset-editor {
   background: var(--dazn-dark-grey);
   border: 1px solid var(--dazn-light-grey);
@@ -696,14 +904,9 @@ a:hover { text-decoration: underline; }
   flex-wrap: wrap;
 }
 
-.editor-body {
-  padding: 1.5rem;
-}
+.editor-body { padding: 1.5rem; }
 
-/* Form elements */
-.form-group {
-  margin-bottom: 1.25rem;
-}
+.form-group { margin-bottom: 1.25rem; }
 
 .form-label {
   display: block;
@@ -726,15 +929,9 @@ a:hover { text-decoration: underline; }
   transition: border-color 0.2s;
 }
 
-.form-input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
+.form-input:focus { outline: none; border-color: var(--accent); }
 
-/* Sections editor table */
-.sections-editor {
-  margin-top: 1.5rem;
-}
+.sections-editor { margin-top: 1.5rem; }
 
 .sections-editor-header {
   display: flex;
@@ -800,7 +997,6 @@ a:hover { text-decoration: underline; }
   font-weight: 700;
 }
 
-/* Empty editor state */
 .editor-empty {
   padding: 4rem 2rem;
   text-align: center;
@@ -813,7 +1009,6 @@ a:hover { text-decoration: underline; }
   margin-bottom: 1rem;
 }
 
-/* Import area */
 .import-area {
   border: 2px dashed var(--dazn-light-grey);
   border-radius: 6px;
@@ -826,7 +1021,7 @@ a:hover { text-decoration: underline; }
 
 .import-area:hover {
   border-color: var(--accent);
-  background: rgba(248, 255, 0, 0.03);
+  background: rgba(248,255,0,0.03);
 }
 
 .import-area p {
@@ -870,25 +1065,41 @@ a:hover { text-decoration: underline; }
 
 /* ── Utility ─────────────────────────────────────────────────────────────── */
 .hidden { display: none !important; }
-.text-muted { color: var(--dazn-text-muted); }
-.text-accent { color: var(--accent); }
-.text-center { text-align: center; }
+.text-muted   { color: var(--dazn-text-muted); }
+.text-accent  { color: var(--accent); }
+.text-center  { text-align: center; }
 .mt-1 { margin-top: 0.5rem; }
 .mt-2 { margin-top: 1rem; }
 
+/* Drag and drop */
+.section-row.drag-over {
+  border-color: var(--accent);
+  background: rgba(248,255,0,0.08);
+}
+
 /* ── Responsive ──────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .clock-layout {
-    grid-template-columns: 1fr 1fr;
+  .quad-layout {
+    grid-template-columns: 1fr;
+    height: auto;
   }
 
-  .sections-panel {
-    grid-column: 1 / -1;
-    order: -1;
+  .timer-panel--primary {
+    height: auto;
+    min-height: 400px;
   }
 
-  .controls-panel {
-    grid-column: 1 / -1;
+  .secondary-column {
+    gap: 0.75rem;
+  }
+
+  .timer-panel--secondary {
+    flex: none;
+    min-height: 280px;
+  }
+
+  .secondary-right {
+    width: 160px;
   }
 
   .presets-layout {
@@ -913,25 +1124,21 @@ a:hover { text-decoration: underline; }
     font-size: 0.75rem;
   }
 
-  .clock-layout {
-    grid-template-columns: 1fr;
+  .header-clocks {
+    display: none;
   }
 
-  .utc-time,
-  .total-remaining-time {
-    font-size: 2.2rem;
+  .quad-layout {
+    padding: 0.5rem;
+    gap: 0.5rem;
   }
 
-  .main-content {
-    padding: 1rem;
+  .secondary-right {
+    width: 140px;
   }
 
   .section-row {
     grid-template-columns: 1.5rem 1fr 4.5rem 4.5rem 2rem;
-  }
-
-  .controls-panel {
-    gap: 0.75rem;
   }
 
   .btn-primary,
@@ -943,331 +1150,4 @@ a:hover { text-decoration: underline; }
   }
 
   .nav-btn span.nav-label { display: none; }
-}
-
-/* Drag and drop */
-.section-row.drag-over {
-  border-color: var(--accent);
-  background: rgba(248, 255, 0, 0.08);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   QUAD TIMER LAYOUT
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* UTC clock moves into the header on the quad layout */
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.utc-header-block {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  font-variant-numeric: tabular-nums;
-}
-
-.utc-header-time {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: var(--dazn-white);
-  letter-spacing: 0.05em;
-}
-
-.utc-header-label {
-  font-size: 0.65rem;
-  color: var(--dazn-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-}
-
-.utc-header-date {
-  font-size: 0.7rem;
-  color: var(--dazn-text-muted);
-}
-
-/* Full-viewport quad layout */
-.quad-layout {
-  max-width: 100%;
-  padding: 0.75rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-  height: calc(100vh - 60px);
-  box-sizing: border-box;
-}
-
-/* Secondary column stacks 3 panels vertically */
-.secondary-column {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  min-height: 0;
-}
-
-/* ── Timer Panel Base ──────────────────────────────────────────────────────── */
-.timer-panel {
-  background: var(--dazn-dark-grey);
-  border: 1px solid var(--dazn-light-grey);
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  min-height: 0;
-}
-
-/* Primary takes full left column height */
-.timer-panel--primary {
-  height: 100%;
-}
-
-/* Each secondary takes equal share of right column */
-.timer-panel--secondary {
-  flex: 1;
-  min-height: 0;
-}
-
-/* Active panel highlight */
-.timer-panel:has(.status-badge.running) {
-  border-color: var(--dazn-success);
-  box-shadow: 0 0 0 1px var(--dazn-success);
-}
-
-.timer-panel:has(.status-badge.paused) {
-  border-color: var(--dazn-warning);
-}
-
-.timer-panel:has(.status-badge.finished) {
-  border-color: var(--dazn-danger);
-}
-
-/* ── Panel Header ─────────────────────────────────────────────────────────── */
-.timer-panel-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 1rem;
-  border-bottom: 1px solid var(--dazn-light-grey);
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-.timer-panel-label {
-  font-size: 0.65rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--accent);
-  flex-shrink: 0;
-}
-
-.timer-panel-header .preset-name-display {
-  flex: 1;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--dazn-white);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* ── Primary Panel internals ──────────────────────────────────────────────── */
-.timer-sections-wrap {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
-}
-
-.timer-totals {
-  padding: 1rem;
-  border-top: 1px solid var(--dazn-light-grey);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.6rem;
-  flex-shrink: 0;
-}
-
-.timer-totals .total-remaining-time {
-  font-size: 2.4rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-.timer-totals .total-remaining-label {
-  font-size: 0.65rem;
-  color: var(--dazn-text-muted);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.current-section-block {
-  text-align: center;
-}
-
-.current-section-time {
-  font-size: 1.6rem;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  color: var(--dazn-white);
-}
-
-.current-section-name {
-  font-size: 0.75rem;
-  color: var(--dazn-text-muted);
-  margin-top: 0.15rem;
-}
-
-/* Primary controls */
-.timer-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  padding: 0.75rem 1rem;
-  border-top: 1px solid var(--dazn-light-grey);
-  flex-shrink: 0;
-}
-
-/* ── Secondary Panel internals ────────────────────────────────────────────── */
-.secondary-body {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.secondary-sections-wrap {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
-  border-right: 1px solid var(--dazn-light-grey);
-}
-
-.sections-container--compact .sections-list .section-item {
-  padding: 0.5rem 0.75rem;
-  gap: 0.5rem;
-}
-
-.sections-container--compact .section-name {
-  font-size: 0.8rem;
-}
-
-.sections-container--compact .section-duration {
-  font-size: 0.8rem;
-  min-width: 3.5rem;
-}
-
-.sections-container--compact .section-index {
-  font-size: 0.65rem;
-  width: 1.2rem;
-}
-
-.sections-container--compact .no-preset {
-  padding: 1rem;
-}
-
-.sections-container--compact .no-preset-icon {
-  font-size: 1.5rem;
-}
-
-.sections-container--compact .no-preset p {
-  font-size: 0.75rem;
-  margin-bottom: 0.25rem;
-}
-
-/* Right side of secondary: totals + controls stacked */
-.secondary-right {
-  display: flex;
-  flex-direction: column;
-  width: 180px;
-  flex-shrink: 0;
-}
-
-.timer-totals--compact {
-  padding: 0.6rem 0.75rem;
-  border-bottom: 1px solid var(--dazn-light-grey);
-  gap: 0.35rem;
-}
-
-.timer-totals--compact .total-remaining-time {
-  font-size: 1.5rem;
-}
-
-.timer-totals--compact .total-remaining-label {
-  font-size: 0.6rem;
-}
-
-.timer-totals--compact .current-section-time {
-  font-size: 1.1rem;
-}
-
-.timer-totals--compact .current-section-name {
-  font-size: 0.65rem;
-}
-
-/* Compact controls for secondary timers */
-.timer-controls--compact {
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.5rem 0.6rem;
-  border-top: none;
-}
-
-.timer-controls--compact .override-group {
-  flex-direction: row;
-  gap: 0.3rem;
-  align-items: center;
-}
-
-.timer-controls--compact .override-label {
-  font-size: 0.55rem;
-  width: 1rem;
-  text-align: center;
-}
-
-/* Small button variant */
-.btn-sm {
-  font-size: 0.7rem !important;
-  padding: 0.35rem 0.7rem !important;
-  min-width: unset !important;
-}
-
-.btn-override--xs {
-  font-size: 0.6rem;
-  padding: 0.25rem 0.5rem;
-}
-
-/* ── Responsive: collapse to single column on narrow screens ──────────────── */
-@media (max-width: 900px) {
-  .quad-layout {
-    grid-template-columns: 1fr;
-    height: auto;
-  }
-
-  .timer-panel--primary {
-    height: auto;
-    min-height: 400px;
-  }
-
-  .secondary-column {
-    gap: 0.75rem;
-  }
-
-  .timer-panel--secondary {
-    flex: none;
-    min-height: 280px;
-  }
-
-  .secondary-right {
-    width: 160px;
-  }
 }

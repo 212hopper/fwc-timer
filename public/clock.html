@@ -21,12 +21,27 @@
         <div class="header-instance" id="headerInstance"></div>
       </div>
     </div>
+
     <div class="header-right">
-      <div class="utc-header-block">
-        <span class="utc-header-time" id="utcTime">--:--:--</span>
-        <span class="utc-header-label">UTC</span>
-        <span class="utc-header-date" id="utcDate">--</span>
+      <!-- Dual clocks: UTC + Dallas -->
+      <div class="header-clocks">
+        <div class="header-clock-block">
+          <span class="header-clock-time" id="utcTime">--:--:--</span>
+          <div class="header-clock-meta">
+            <span class="header-clock-label">UTC</span>
+            <span class="header-clock-date" id="utcDate">--</span>
+          </div>
+        </div>
+        <div class="header-clock-divider"></div>
+        <div class="header-clock-block">
+          <span class="header-clock-time" id="dallasTime">--:--:--</span>
+          <div class="header-clock-meta">
+            <span class="header-clock-label" id="dallasLabel">Dallas · CT</span>
+            <span class="header-clock-date" id="dallasDate">--</span>
+          </div>
+        </div>
       </div>
+
       <nav class="header-nav">
         <a href="/" class="nav-btn active">⏱ <span class="nav-label">Clock</span></a>
         <a href="/presets" class="nav-btn">☰ <span class="nav-label">Presets</span></a>
@@ -52,13 +67,17 @@
       </div>
 
       <div class="timer-totals">
-        <div class="total-remaining-time" id="totalRemaining-primary">--:--</div>
-        <div class="total-remaining-label">Total Remaining</div>
-        <div class="status-badge idle" id="statusBadge-primary">Idle</div>
+        <!-- Current segment is now the PRIMARY large number -->
         <div class="current-section-block" id="currentSectionBlock-primary" style="display:none;">
-          <div class="current-section-time" id="currentSectionTime-primary">--:--</div>
+          <div class="current-section-time current-section-time--primary" id="currentSectionTime-primary">--:--</div>
           <div class="current-section-name" id="currentSectionName-primary">--</div>
         </div>
+        <!-- Total remaining is now the SECONDARY smaller number -->
+        <div class="total-remaining-block">
+          <div class="total-remaining-time total-remaining-time--secondary" id="totalRemaining-primary">--:--</div>
+          <div class="total-remaining-label">Total Remaining</div>
+        </div>
+        <div class="status-badge idle" id="statusBadge-primary">Idle</div>
       </div>
 
       <div class="timer-controls">
@@ -95,13 +114,15 @@
           </div>
           <div class="secondary-right">
             <div class="timer-totals timer-totals--compact">
-              <div class="total-remaining-time" id="totalRemaining-secondary-1">--:--</div>
-              <div class="total-remaining-label">Remaining</div>
-              <div class="status-badge idle" id="statusBadge-secondary-1">Idle</div>
+              <!-- Current segment PRIMARY -->
               <div class="current-section-block" id="currentSectionBlock-secondary-1" style="display:none;">
                 <div class="current-section-time" id="currentSectionTime-secondary-1">--:--</div>
                 <div class="current-section-name" id="currentSectionName-secondary-1">--</div>
               </div>
+              <!-- Total remaining SECONDARY -->
+              <div class="total-remaining-time total-remaining-time--secondary" id="totalRemaining-secondary-1">--:--</div>
+              <div class="total-remaining-label">Remaining</div>
+              <div class="status-badge idle" id="statusBadge-secondary-1">Idle</div>
             </div>
             <div class="timer-controls timer-controls--compact">
               <div class="override-group">
@@ -136,13 +157,13 @@
           </div>
           <div class="secondary-right">
             <div class="timer-totals timer-totals--compact">
-              <div class="total-remaining-time" id="totalRemaining-secondary-2">--:--</div>
-              <div class="total-remaining-label">Remaining</div>
-              <div class="status-badge idle" id="statusBadge-secondary-2">Idle</div>
               <div class="current-section-block" id="currentSectionBlock-secondary-2" style="display:none;">
                 <div class="current-section-time" id="currentSectionTime-secondary-2">--:--</div>
                 <div class="current-section-name" id="currentSectionName-secondary-2">--</div>
               </div>
+              <div class="total-remaining-time total-remaining-time--secondary" id="totalRemaining-secondary-2">--:--</div>
+              <div class="total-remaining-label">Remaining</div>
+              <div class="status-badge idle" id="statusBadge-secondary-2">Idle</div>
             </div>
             <div class="timer-controls timer-controls--compact">
               <div class="override-group">
@@ -177,13 +198,13 @@
           </div>
           <div class="secondary-right">
             <div class="timer-totals timer-totals--compact">
-              <div class="total-remaining-time" id="totalRemaining-secondary-3">--:--</div>
-              <div class="total-remaining-label">Remaining</div>
-              <div class="status-badge idle" id="statusBadge-secondary-3">Idle</div>
               <div class="current-section-block" id="currentSectionBlock-secondary-3" style="display:none;">
                 <div class="current-section-time" id="currentSectionTime-secondary-3">--:--</div>
                 <div class="current-section-name" id="currentSectionName-secondary-3">--</div>
               </div>
+              <div class="total-remaining-time total-remaining-time--secondary" id="totalRemaining-secondary-3">--:--</div>
+              <div class="total-remaining-label">Remaining</div>
+              <div class="status-badge idle" id="statusBadge-secondary-3">Idle</div>
             </div>
             <div class="timer-controls timer-controls--compact">
               <div class="override-group">

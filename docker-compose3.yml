@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  fwc-vog-timing-team1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ${CONTAINER_NAME:-fwc-vog-timing-team1}
+    restart: unless-stopped
+    ports:
+      - "${EXTERNAL_PORT:-5001}:3000"
+    volumes:
+      - vog_data_team1:/app/data
+    environment:
+      - NODE_ENV=production
+      - INSTANCE_NAME=${INSTANCE_NAME:-FWC VoG Timing System - Team 1}
+      - INSTANCE_COLOR=${INSTANCE_COLOR:-#F8FF00}
+
+volumes:
+  vog_data_team1:
